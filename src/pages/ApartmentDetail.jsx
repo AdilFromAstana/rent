@@ -1,12 +1,19 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Carousel, Button, Card } from "antd";
 import { LeftOutlined, HeartOutlined, HeartFilled } from "@ant-design/icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFilters } from "../context/FilterContext"; // Используем фильтры
 import apartments from "../data/apartments";
 import "./ApartmentDetail.css";
 import { Circle, Map, Placemark, YMaps } from "react-yandex-maps";
 import dayjs from "dayjs";
+
+const MobileOnlyPage = () => (
+  <div style={{ textAlign: "center", padding: "50px", color: "black" }}>
+    <h1>Этот сайт доступен только с мобильных устройств</h1>
+    <p>Попробуйте открыть его на телефоне или уменьшите размер окна.</p>
+  </div>
+);
 
 function ApartmentDetail() {
   const { id } = useParams();
@@ -17,6 +24,17 @@ function ApartmentDetail() {
     coordinates: { lat: 51.1694, lng: 71.4491 },
   };
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (!isMobile) {
+    return <MobileOnlyPage />;
+  }
 
   if (!apartment) {
     return (

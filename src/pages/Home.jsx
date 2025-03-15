@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Select,
@@ -30,6 +30,13 @@ import { useFilters } from "../context/FilterContext";
 const { Option } = Select;
 const { Text } = Typography;
 
+const MobileOnlyPage = () => (
+  <div style={{ textAlign: "center", padding: "50px", color: "black" }}>
+    <h1>Этот сайт доступен только с мобильных устройств</h1>
+    <p>Попробуйте открыть его на телефоне или уменьшите размер окна.</p>
+  </div>
+);
+
 const Home = () => {
   const {
     roomsFilter,
@@ -47,6 +54,7 @@ const Home = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [dateDrawerVisible, setDateDrawerVisible] = useState(false);
   const [favorites, setFavorites] = useState([]); // Избранное
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const today = dayjs().startOf("day"); // Сегодня
   const maxStayDays = 30; // Максимальная аренда 30 дней
@@ -56,8 +64,6 @@ const Home = () => {
     selectedDates[0] && selectedDates[1]
       ? dayjs(selectedDates[1]).diff(dayjs(selectedDates[0]), "day")
       : 0;
-
-  console.log("selectedDates: ", selectedDates);
 
   // Фильтрация квартир
   const filteredApartments = apartments.filter((apartment) => {
@@ -113,7 +119,6 @@ const Home = () => {
 
     return filters.length ? filters.join(" • ") : "Найти квартиру";
   };
-
   // Обновление диапазона дат
   const handleDateChange = (range) => {
     if (range.length === 2) {
@@ -141,6 +146,16 @@ const Home = () => {
         : [...prevFavorites, id]
     );
   };
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (!isMobile) {
+    return <MobileOnlyPage />;
+  }
 
   return (
     <div className="container">
