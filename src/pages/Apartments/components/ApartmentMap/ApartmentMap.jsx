@@ -26,7 +26,7 @@ const ApartmentMap = ({
 
   return (
     <MapContainer
-      center={center[city]}
+      center={[51.1605, 71.4704]}
       zoom={14}
       style={{ height: "100%", width: "100%" }}
     >
