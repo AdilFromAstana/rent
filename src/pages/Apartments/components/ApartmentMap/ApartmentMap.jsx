@@ -4,18 +4,13 @@ import "leaflet/dist/leaflet.css";
 import { useFilters } from "../../../../context/FilterContext";
 import dayjs from "dayjs";
 
-const center = {
-  almaty: [43.238949, 76.889709],
-  astana: [51.1605, 71.4704],
-};
-
 const ApartmentMap = ({
   apartments,
   selectedApartment,
   onSelect,
   onNavigate,
 }) => {
-  const { city, selectedDates } = useFilters();
+  const { selectedDates } = useFilters();
 
   const nights =
     selectedDates?.[0] && selectedDates?.[1]
