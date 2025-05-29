@@ -1,86 +1,82 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { YMaps } from "react-yandex-maps";
-import { useFilters } from "../../context/FilterContext";
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button, Row, Col, Divider } from "antd";
 import apartments from "../../data/apartments";
-import dayjs from "dayjs";
-import TopNavigationBar from "./components/TopNavigationBar/TopNavigationBar";
-import ApartmentCarousel from "./components/ApartmentCarousel/ApartmentCarousel";
-import ApartmentInfoCard from "./components/ApartmentInfoCard/ApartmentInfoCard";
-import ApartmentLocationMap from "./components/ApartmentLocationMap/ApartmentLocationMap";
-import BookingFooter from "./components/BookingFooter/BookingFooter";
-import BookingModal from "./components/BookingModal/BookingModal"; // Новый импорт
-import "./ApartmentDetail.css";
+import "./ApartmentDetail.scss";
+import ApartmentGallery from "./components/ApartmentGallery/ApartmentGallery";
+import ApartmentHeader from "./components/ApartmentHeader/ApartmentHeader";
+import LocationMap from "./components/LocationMap/LocationMap";
+import AmenitiesList from "./components/AmenitiesList/AmenitiesList";
+import HostInfo from "./components/HostInfo/HostInfo";
+import ReviewsList from "./components/ReviewsList/ReviewsList";
+import BookingCard from "./components/BookingCard/BookingCard";
+import FaceVerificationModal from "./components/FaceVerificationModal/FaceVerificationModal";
 
-function ApartmentDetail() {
+const ApartmentDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { selectedDates } = useFilters();
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const apartment = apartments.find((apt) => apt.id === Number(id));
+  const [showModal, setShowModal] = useState(false);
 
-  const apartment = {
-    ...apartments.find((apt) => apt.id === Number(id)),
-    coordinates: { lat: 51.1694, lng: 71.4491 },
-    images: Array(3).fill(""),
+  const handleBooking = () => {
+    setShowModal(true);
   };
 
-  if (!apartment) {
-    return (
-      <h2 style={{ textAlign: "center", marginTop: "20px" }}>
-        Квартира не найдена
-      </h2>
-    );
-  }
-
-  const rentalDays =
-    selectedDates[0] && selectedDates[1]
-      ? dayjs(selectedDates[1]).diff(dayjs(selectedDates[0]), "day")
-      : 0;
-
-  const handleBook = () => {
-    setIsBookingModalOpen(true);
-  };
+  if (!apartment) return <div style={{ padding: 32 }}>Квартира не найдена</div>;
 
   return (
-    <YMaps>
-      <div className="apartment-detail-container">
-        <TopNavigationBar
-          onBack={() => navigate("..")}
-          isFavorite={isFavorite}
-          toggleFavorite={() => setIsFavorite(!isFavorite)}
-        />
+    <div className="apartment-details">
+      <Button onClick={() => navigate(-1)} style={{ marginBottom: 16 }}>
+        ← Назад
+      </Button>
 
-        <ApartmentCarousel images={apartment.images} title={apartment.title} />
+      <Row gutter={[32, 32]}>
+        <Col xs={24} md={14}>
+          <ApartmentGallery images={apartment.images} />
 
-        <ApartmentInfoCard
-          title={apartment.title}
-          price={apartment.price}
-          rentalDays={rentalDays}
-          description={apartment.description}
-        />
+          <ApartmentHeader
+            title={apartment.title}
+            price={apartment.price}
+            location={apartment.location}
+          />
 
-        <ApartmentLocationMap
-          location={apartment.location}
-          coordinates={apartment.coordinates}
-        />
+          {apartment.coords && (
+            <>
+              <Divider orientation="left">Расположение</Divider>
+              <LocationMap coords={apartment.coords} />
+            </>
+          )}
 
-        <BookingFooter
-          price={apartment.price}
-          rentalDays={rentalDays}
-          onBook={handleBook}
-        />
+          <Divider orientation="left">Удобства</Divider>
+          <AmenitiesList />
 
-        <BookingModal
-          open={isBookingModalOpen}
-          onClose={() => setIsBookingModalOpen(false)}
-          apartmentPrice={apartment.price}
-          rentalDays={rentalDays} // добавили это
-          selectedDates={selectedDates}
-        />
-      </div>
-    </YMaps>
+          <Divider orientation="left">О хозяине</Divider>
+          <HostInfo />
+
+          <Divider orientation="left">Отзывы</Divider>
+          <ReviewsList />
+        </Col>
+
+        <Col xs={24} md={10}>
+          <BookingCard
+            price={apartment.price}
+            onBooking={handleBooking}
+            bookedDates={apartment.bookedDates}
+          />
+        </Col>
+      </Row>
+
+      <FaceVerificationModal
+        apartment={apartment}
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        onSuccess={() => {
+          setShowModal(false);
+          console.log("Заказ подтверждён!");
+        }}
+      />
+    </div>
   );
-}
+};
 
 export default ApartmentDetail;

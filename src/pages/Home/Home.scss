@@ -1,0 +1,43 @@
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  // По умолчанию (мобильные устройства)
+  max-width: 100%;
+
+  // SM: ≥ 640px
+  @media (min-width: 640px) {
+    max-width: 640px;
+  }
+
+  // MD: ≥ 768px
+  @media (min-width: 768px) {
+    max-width: 768px;
+  }
+
+  // LG: ≥ 1024px
+  @media (min-width: 1024px) {
+    max-width: 1024px;
+  }
+
+  // XL: ≥ 1280px
+  @media (min-width: 1280px) {
+    max-width: 1280px;
+  }
+
+  // 2XL: ≥ 1400px
+  @media (min-width: 1400px) {
+    max-width: 1400px;
+  }
+
+  // 3XL (если нужно): ≥ 1600px
+  @media (min-width: 1600px) {
+    max-width: 1400px; // или 1600px, если хочешь больше
+  }
+}
